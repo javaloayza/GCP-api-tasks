@@ -1,0 +1,9 @@
+{
+  "name": "login",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.0.0",
+    "firebase-admin": "^12.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  }
+}

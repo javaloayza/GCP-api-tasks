@@ -1,0 +1,124 @@
+# Configuración de API Gateway para Tasks API
+# Este archivo define cómo el API Gateway redirige las peticiones
+
+swagger: "2.0"
+info:
+  title: "Tasks API"
+  description: "API para gestión de tareas con Cloud Functions"
+  version: "1.0.0"
+  
+# URL base del API Gateway (se asigna automáticamente)
+host: "tasks-api-gateway-XXXXX-uc.a.run.app"
+basePath: "/api"
+
+# Esquemas de comunicación permitidos
+schemes:
+  - "https"
+
+# Definición de rutas y métodos
+paths:
+  # GET /api/tasks - Obtener todas las tareas
+  /tasks:
+    get:
+      summary: "Obtener todas las tareas"
+      operationId: "getTasks"
+      # Redirecciona a tu Cloud Function
+      x-google-backend:
+        address: "https://us-central1-root-alignment-466003-v3.cloudfunctions.net/getTasks"
+      responses:
+        200:
+          description: "Lista de tareas obtenida exitosamente"
+    
+    # POST /api/tasks - Crear nueva tarea
+    post:
+      summary: "Crear nueva tarea"
+      operationId: "createTask"
+      x-google-backend:
+        address: "https://us-central1-root-alignment-466003-v3.cloudfunctions.net/createTask"
+      # Parámetros que acepta
+      parameters:
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+              description:
+                type: "string"
+      responses:
+        201:
+          description: "Tarea creada exitosamente"
+
+  # Rutas con parámetros: /api/tasks/{id}
+  /tasks/{id}:
+    # GET /api/tasks/123 - Obtener tarea específica
+    get:
+      summary: "Obtener tarea por ID"
+      operationId: "getTaskById" 
+      x-google-backend:
+        address: "https://us-central1-root-alignment-466003-v3.cloudfunctions.net/getTaskById"
+        # Mapear {id} del path al query parameter ?id=
+        path_translation: "APPEND_PATH_TO_ADDRESS"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Tarea obtenida exitosamente"
+        404:
+          description: "Tarea no encontrada"
+    
+    # PUT /api/tasks/123 - Actualizar tarea
+    put:
+      summary: "Actualizar tarea"
+      operationId: "updateTask"
+      x-google-backend:
+        address: "https://us-central1-root-alignment-466003-v3.cloudfunctions.net/updateTask"
+        path_translation: "APPEND_PATH_TO_ADDRESS"
+      parameters:
+        - name: "id"
+          in: "path" 
+          required: true
+          type: "integer"
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+              description:
+                type: "string"
+              completed:
+                type: "boolean"
+      responses:
+        200:
+          description: "Tarea actualizada exitosamente"
+    
+    # DELETE /api/tasks/123 - Eliminar tarea
+    delete:
+      summary: "Eliminar tarea"
+      operationId: "deleteTask"
+      x-google-backend:
+        address: "https://us-central1-root-alignment-466003-v3.cloudfunctions.net/deleteTask"
+        path_translation: "APPEND_PATH_TO_ADDRESS"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Tarea eliminada exitosamente"
+        404:
+          description: "Tarea no encontrada"
+
+# Configuración CORS para permitir peticiones desde frontend
+x-google-endpoints:
+  - name: "tasks-api-gateway-XXXXX-uc.a.run.app"
+    allowCors: true
