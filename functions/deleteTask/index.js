@@ -1,3 +1,5 @@
+const functions = require('@google-cloud/functions-framework');
+const { authenticateUser } = require('./authMiddleware');
 const { Pool } = require('pg');
 const cors = require('cors');
 require('dotenv').config();
@@ -14,9 +16,10 @@ const pool = new Pool({
 });
 
 // Función para eliminar tarea - equivalente a tu lambda deleteTask
-exports.deleteTask = async (req, res) => {
-  cors()(req, res, async () => {
-    try {
+functions.http('deleteTask', async (req, res) => {
+  cors(req, res, async () => {
+    authenticateUser(req, res, async () => {
+      try {
       // Solo acepta método DELETE
       if (req.method !== 'DELETE') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -71,5 +74,6 @@ exports.deleteTask = async (req, res) => {
         message: error.message 
       });
     }
+    });
   });
-};
+});
