@@ -1,3 +1,4 @@
+const functions = require('@google-cloud/functions-framework');
 const { Pool } = require('pg');
 const cors = require('cors');
 require('dotenv').config();
@@ -16,7 +17,7 @@ const pool = new Pool({
 });
 
 // Función para crear tarea - equivalente a tu lambda addTask
-exports.createTask = async (req, res) => {
+functions.http('createTask', async (req, res) => {
   cors()(req, res, async () => {
     // Agregar autenticación
     authenticateUser(req, res, async () => {
@@ -58,6 +59,6 @@ exports.createTask = async (req, res) => {
           message: error.message 
         });
       }
-    }); 
+   });
   });
-};
+});

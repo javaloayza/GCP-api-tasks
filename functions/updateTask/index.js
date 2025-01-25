@@ -1,3 +1,5 @@
+const functions = require('@google-cloud/functions-framework');
+const { authenticateUser } = require('./authMiddleware');
 const { Pool } = require('pg');
 const cors = require('cors');
 require('dotenv').config();
@@ -14,8 +16,9 @@ const pool = new Pool({
 });
 
 // Función para actualizar tarea - equivalente a tu lambda updateTask
-exports.updateTask = async (req, res) => {
-  cors()(req, res, async () => {
+functions.http('updateTask', async (req, res) => {
+  cors(req, res, async () => {
+    authenticateUser(req, res, async () => {
     try {
       // Solo acepta PUT o PATCH
       if (req.method !== 'PUT' && req.method !== 'PATCH') {
@@ -102,5 +105,6 @@ exports.updateTask = async (req, res) => {
         message: error.message 
       });
     }
+    });
   });
-};
+});
